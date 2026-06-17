@@ -25440,6 +25440,7 @@ document.addEventListener("DOMContentLoaded", function() {
         desk.style.display = 'block';
         mob.style.display = 'none';
         const scale = Math.min(vw / DESKTOP_W, 1);
+        desk.style.transformOrigin = 'top left';
         desk.style.transform = 'scale(' + scale + ')';
         desk.style.width = DESKTOP_W + 'px';
         desk.style.height = ''; // Reset height to measure correctly
@@ -25449,6 +25450,11 @@ document.addEventListener("DOMContentLoaded", function() {
         desk.style.display = 'none';
         mob.style.display = 'block';
         const scale = vw / MOBILE_W;
+        // Pin to the left edge with no auto margin: the scaled canvas is exactly
+        // vw wide, so it fills the viewport edge-to-edge with no side gaps.
+        // (margin:auto only centres when vw>360, which made the gaps uneven.)
+        mob.style.margin = '0';
+        mob.style.transformOrigin = 'top left';
         mob.style.transform = 'scale(' + scale + ')';
         mob.style.width = MOBILE_W + 'px';
         mob.style.height = ''; // Reset height to measure correctly
