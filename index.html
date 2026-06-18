@@ -25592,9 +25592,24 @@ document.addEventListener("DOMContentLoaded", function() {
         document.body.style.height = (mob.getBoundingClientRect().height) + 'px';
       }
     }
-    window.addEventListener('resize', fit);
-    window.addEventListener('load', fit);
+    // Mobile browsers fire `resize` every time the URL bar hides/shows while
+    // scrolling. Re-running fit() (which writes transform + body height) on each
+    // of those caused relayout mid-scroll → the page felt frozen / unscrollable.
+    // Only react when the WIDTH changes (real resize / rotation), ignore pure
+    // height changes from the toolbar. rAF-debounced to avoid layout thrash.
+    let lastW = -1, raf = 0;
+    function onResize() {
+      const vw = document.documentElement.clientWidth;
+      if (vw === lastW) return;
+      lastW = vw;
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fit);
+    }
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', function () { lastW = -1; onResize(); });
+    window.addEventListener('load', function () { lastW = -1; onResize(); });
     fit();
+    lastW = document.documentElement.clientWidth;
   </script>
 
   <!-- Checkout Modal -->
